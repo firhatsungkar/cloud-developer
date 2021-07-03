@@ -18,13 +18,48 @@ router.get('/', async (req: Request, res: Response) => {
 
 //@TODO
 //Add an endpoint to GET a specific resource by Primary Key
+router.get("/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const item = await FeedItem.findByPk(id);
+
+    if (!item?.id) return res.status(404).send("Feed not found");
+
+    return res.status(200).send(item);
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
+});
 
 // update a specific resource
 router.patch('/:id', 
     requireAuth, 
     async (req: Request, res: Response) => {
         //@TODO try it yourself
-        res.send(500).send("not implemented")
+        const { id } = req.params;
+        const body = req.body as { [key: string]: any };
+        try {
+          const item = await FeedItem.findByPk(id);
+
+          if (!item?.id) return res.status(404).send("Feed not found");
+
+          const updatedBody = Object.keys(body).reduce(
+            (acc, curr) => ({
+              ...acc,
+              ...(curr === "caption" ? { caption: body[curr] } : {}),
+              ...(curr === "url" ? { url: body[curr] } : {}),
+            }),
+            {} as Partial<FeedItem>
+          );
+
+          await item.update(updatedBody);
+
+          item.url = AWS.getGetSignedUrl(item.url);
+
+          return res.status(200).send(item);
+        } catch (error) {
+          return res.status(500).send({ error: error.message });
+        }
 });
 
 
