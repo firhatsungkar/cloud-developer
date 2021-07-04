@@ -1,40 +1,267 @@
 {
 	"info": {
-		"_postman_id": "4bcf1909-8996-44b7-be35-b130ab03d12f",
+		"_postman_id": "757e14ac-43a3-415d-8c5a-827b4d3c8b43",
 		"name": "cloud-cdnd-c2-final",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "http://localhost:8082/filteredimage?image_url=https://timedotcom.files.wordpress.com/2019/03/kitten-report.jpg",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://{{HOST}}/filteredimage?image_url=https://timedotcom.files.wordpress.com/2019/03/kitten-report.jpg",
-					"protocol": "http",
-					"host": [
-						"{{HOST}}"
-					],
-					"path": [
-						"filteredimage"
-					],
-					"query": [
+			"name": "Authorized",
+			"item": [
+				{
+					"name": "filteredImage Invalid URL",
+					"event": [
 						{
-							"key": "image_url",
-							"value": "https://timedotcom.files.wordpress.com/2019/03/kitten-report.jpg"
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", () => {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Response include an error\", () => {",
+									"    pm.response.to.have.body('Invalid URL: invalid_url')",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 200ms\", () => {",
+									"    pm.expect(pm.response.responseTime).lessThan(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
 						}
-					]
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{HOST}}/filteredimage?image_url=invalid_url",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"filteredimage"
+							],
+							"query": [
+								{
+									"key": "image_url",
+									"value": "invalid_url"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "filteredImage Unsupported format",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", () => {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Response include an error\", () => {",
+									"    pm.response.to.have.body('Only support file type: jpg, jpeg, png.')",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 300ms\", () => {",
+									"    pm.expect(pm.response.responseTime).lessThan(300);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{HOST}}/filteredimage?image_url=https://www.udacity.com/blog/wp-content/uploads/2021/05/Udacity_Logo_SVG_200x35-white.svg",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"filteredimage"
+							],
+							"query": [
+								{
+									"key": "image_url",
+									"value": "https://www.udacity.com/blog/wp-content/uploads/2021/05/Udacity_Logo_SVG_200x35-white.svg"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "filteredImage",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response include an image\", () => {",
+									"    pm.expect(",
+									"        pm.response.headers.get('content-type')",
+									"    ).to.eq('image/jpeg');",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 1000ms\", () => {",
+									"    pm.expect(pm.response.responseTime).lessThan(1000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{HOST}}/filteredimage?image_url=https://d125fmws0bore1.cloudfront.net/assets/legacy/shared/udacity_wordmark-d61abaf6604c5809376c45fdff75ac33d44bc7c9bd07aa6ca3b7b0a022a3ea9e.png",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"filteredimage"
+							],
+							"query": [
+								{
+									"key": "image_url",
+									"value": "https://d125fmws0bore1.cloudfront.net/assets/legacy/shared/udacity_wordmark-d61abaf6604c5809376c45fdff75ac33d44bc7c9bd07aa6ca3b7b0a022a3ea9e.png"
+								}
+							]
+						}
+					},
+					"response": []
 				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{TOKEN}}",
+						"type": "string"
+					}
+				]
 			},
-			"response": []
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Unauthorized",
+			"item": [
+				{
+					"name": "filteredImage invalid token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401\", () => {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Response include an image\", () => {",
+									"    pm.response.to.have.body('{\"message\":\"Malformed token.\"}')",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 1000ms\", () => {",
+									"    pm.expect(pm.response.responseTime).lessThan(1000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{HOST}}/filteredimage?image_url=https://d125fmws0bore1.cloudfront.net/assets/legacy/shared/udacity_wordmark-d61abaf6604c5809376c45fdff75ac33d44bc7c9bd07aa6ca3b7b0a022a3ea9e.png",
+							"protocol": "http",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"filteredimage"
+							],
+							"query": [
+								{
+									"key": "image_url",
+									"value": "https://d125fmws0bore1.cloudfront.net/assets/legacy/shared/udacity_wordmark-d61abaf6604c5809376c45fdff75ac33d44bc7c9bd07aa6ca3b7b0a022a3ea9e.png"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "invalid_token",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
 		}
 	],
 	"event": [
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "5887df52-1889-4e1f-82ee-054ab37b450a",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -44,7 +271,6 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "5e332dfe-c833-430b-b947-ab6c00311c28",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -54,10 +280,12 @@
 	],
 	"variable": [
 		{
-			"id": "1df3d31a-de30-494b-a3d0-f1228dd8713c",
 			"key": "HOST",
-			"value": "localhost:8082",
-			"type": "string"
+			"value": "udagramprocessimagedev-dev.eba-szxax59g.ap-southeast-1.elasticbeanstalk.com"
+		},
+		{
+			"key": "TOKEN",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhlbGxvQGdtYWlsLmNvbSIsInBhc3N3b3JkX2hhc2giOiIkMmIkMTAkaGV2bThhdGgwWWV6clIyektTb0N0ZW1EQUphLllwSlhPSG8va3l1emRlN2M4azdRWEIvdVMiLCJjcmVhdGVkQXQiOiIyMDIxLTA3LTAzVDA4OjI3OjA5LjYyNFoiLCJ1cGRhdGVkQXQiOiIyMDIxLTA3LTAzVDA4OjI3OjA5LjYyNFoiLCJpYXQiOjE2MjUzOTA2ODd9.i1TE-Wed97KFQB4K31L55KyrEHM_4QCxjPq0e5yWShs"
 		}
 	]
 }
