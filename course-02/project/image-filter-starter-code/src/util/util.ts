@@ -1,5 +1,8 @@
 import fs from 'fs';
+import fetch from "node-fetch";
 import Jimp = require('jimp');
+import { NextFunction, Request, Response } from "express";
+import { config } from "../config";
 
 // filterImageFromURL
 // helper function to download, filter, and save the filtered image locally
@@ -31,4 +34,38 @@ export async function deleteLocalFiles(files:Array<string>){
     for( let file of files) {
         fs.unlinkSync(file);
     }
+}
+
+// validate url
+// helper function to check whether the url valid or not
+export async function checkURL(url: string) {
+    const endpoint = new URL(url);
+    const response = await fetch(endpoint);
+    const supportedFormat = ['jpg', 'jpeg', 'png'];
+    const [type, format] = response.headers.get('content-type').split('/');
+    const validType = supportedFormat.find(f => f === format);
+    if (!response.ok) throw new Error("Invalid URL");
+    if (!validType) throw new Error(`Only support file type: ${supportedFormat.join(', ')}.`)
+    return true;
+}
+
+// Validate token
+// helper function to verify JWT token
+export async function verifyToken(token: string) {
+    const endpoint = config.auth_verify_endpoint;
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'Cache-Control': 'no-cache'
+    };
+    const method = 'GET'
+    const response = await fetch(endpoint, { method, headers });
+
+    if (!response.ok) throw new Error('Failed to authenticate.');
+
+    const data = await response.json();
+
+    if(!data.auth) throw new Error('Failed to authenticate.');
+
+    return true
 }
